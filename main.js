@@ -1,5 +1,6 @@
 const API_KEY=`9d28b9131a0d4ce6bde7508053fd0bbd`
 let newsList=[]
+
 const menus = document.querySelectorAll(".menus button")
 menus.forEach(menu=>menu.addEventListener("click",(event)=>getNewsByCategory(event)))
 
@@ -14,6 +15,7 @@ const getLatestNews = async ()=>{
     render()
     
 };
+
 
 const getNewsByCategory = async (event)=>{
   const category = event.target.textContent.toLowerCase()
