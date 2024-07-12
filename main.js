@@ -6,8 +6,16 @@ menus.forEach(menu=>menu.addEventListener("click",(event)=>getNewsByCategory(eve
 
 let url = new URL(`https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=kr&apiKey=${API_KEY}`)
 
+let totalResults = 0
+let page = 1
+const pageSize = 10
+const groupSize = 5
+
+
 const getNews = async() => {
     try{
+      url.searchParams.set("page",page) // => &page=page
+      url.searchParams.set("pageSize",pageSize)
       const response = await fetch(url);
       const data = await response.json();
       if(response.status==200){
@@ -15,7 +23,9 @@ const getNews = async() => {
           throw new Error("검색어와 일치하는 결과가 없습니다.");
         }
         newsList = data.articles;
+        totalResults = data.totalResults
         render();
+        paginationRender();
       }else{
         throw new Error(data.message)
       }
@@ -71,7 +81,7 @@ const render=()=>{
                 ? news.description.substring(0, 200) + "..."
                 : news.description
             }</p>
-                <div>${news.rights || "no source"}  ${moment(news.published_date).fromNow()}</div>
+                <div>${news.rights || "no source"}  ${moment(news.publishedAt).fromNow()}</div>
             </div>
         </div>`
     )
@@ -83,8 +93,46 @@ const errorRender = (errorMessage)=>{
   const errorHTML = `<div class="alert alert-danger" role="alert">
   ${errorMessage}
 </div>`
-document.getElementById("news-board").innerHTML=errorHTML
+document.getElementById("news-board").innerHTML = errorHTML;
 }
+
+const paginationRender=()=>{
+  //우리가 정하는 값
+  //totalResult
+  //page
+  //pageSize
+  //groupSize
+
+  //우리가 계산해야할 값
+  const totalPages = Math.ceil(totalResults/pageSize)
+  //pageGroup
+  const pageGroup = Math.ceil(page/groupSize);
+  //lastPage
+  const lastPage = pageGroup * groupSize;
+  //마지막 페이지 그룹이 그룹사이즈보다 작다? > lastpage = totalpage
+  if(lastPage > totalPages){
+    lastPage = totalPages
+  }
+  //firstPage
+  const firstPage = lastPage - (groupSize-1)<=0? 1: lastPage - (groupSize-1)
+ 
+
+  let paginationHTML = `<li class="page-item"><a class="page-link" href="#">Previous</a></li>`;
+
+  for(let i=firstPage;i<=lastPage;i++ ){
+    paginationHTML += `<li class="page-item ${i===page?"active":""}" onclick="moveToPage(${i})"><a class="page-link" >${i}</a></li>`
+  }
+  paginationHTML += `<li class="page-item"><a class="page-link" href="#">Next</a></li>`
+  document.querySelector(".pagination").innerHTML = paginationHTML;
+
+}
+
+
+const moveToPage=(pageNum)=>{
+  page = pageNum
+  getNews()
+}
+
 const openNav = () => {
     document.getElementById("hamburgerNav").style.width = "250px";
   };
@@ -92,6 +140,8 @@ const openNav = () => {
   const closeNav = () => {
     document.getElementById("hamburgerNav").style.width = "0";
   };
+
+  
 getLatestNews();
 
 //1. 버튼들에 클릭 이벤트를 줘야한다. 
