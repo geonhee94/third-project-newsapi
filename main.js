@@ -11,6 +11,9 @@ let page = 1
 const pageSize = 10
 const groupSize = 5
 
+document.getElementById("search-input").addEventListener("focus", function () {
+  this.value = ""
+})
 
 const getNews = async() => {
     try{
@@ -36,25 +39,27 @@ const getNews = async() => {
 }
 
 const getLatestNews = async ()=>{
+  page = 1;
      url = new URL(`https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=kr&apiKey=${API_KEY}`
         
     ) ;
     
-    getNews()
+    await getNews()
     
 };
 
 
 const getNewsByCategory = async (event)=>{
   const category = event.target.textContent.toLowerCase()
+  page = 1
    url = new URL(`https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=kr&category=${category}&apiKey=${API_KEY}`)
-   getNews()
+    await getNews()
 }
 
 const searchNews= async ()=>{
   const keyword = document.getElementById("search-input").value
    url = new URL (`https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=kr&q=${keyword}&apiKey=${API_KEY}`)
-   getNews()
+   await getNews()
 }
 
   const openSearchBox = () => {
@@ -65,7 +70,7 @@ const searchNews= async ()=>{
       inputArea.style.display = "inline";
     }
   };
-const render=()=>{
+let render=()=>{
     const newsHTML = newsList.map(
         (news) => `<div class="row news">
             <div class="col-lg-4">
@@ -102,7 +107,7 @@ const paginationRender=()=>{
   //page
   //pageSize
   //groupSize
-let paginationHTML = ``
+let paginationHTML = ``;
   //우리가 계산해야할 값
   const totalPages = Math.ceil(totalResults/pageSize)
   //pageGroup
@@ -112,7 +117,7 @@ let paginationHTML = ``
 
   }
   //lastPage
-  const lastPage = pageGroup * groupSize;
+  let lastPage = pageGroup * groupSize;
   //마지막 페이지 그룹이 그룹사이즈보다 작다? > lastpage = totalpage
   if(lastPage > totalPages){
     lastPage = totalPages
@@ -137,9 +142,9 @@ if(page>1){
 }
 
 
-const moveToPage=(pageNum)=>{
+const moveToPage=async (pageNum)=>{
   page = pageNum
-  getNews()
+  await getNews()
 }
 
 const openNav = () => {
