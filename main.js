@@ -102,27 +102,36 @@ const paginationRender=()=>{
   //page
   //pageSize
   //groupSize
-
+let paginationHTML = ``
   //우리가 계산해야할 값
   const totalPages = Math.ceil(totalResults/pageSize)
   //pageGroup
   const pageGroup = Math.ceil(page/groupSize);
+  let last = pageGroup * 5
+  if(last>totalPages){
+
+  }
   //lastPage
   const lastPage = pageGroup * groupSize;
   //마지막 페이지 그룹이 그룹사이즈보다 작다? > lastpage = totalpage
   if(lastPage > totalPages){
     lastPage = totalPages
   }
+  let first = last - 4 <= 0 ? 1 : last-4 ;
   //firstPage
   const firstPage = lastPage - (groupSize-1)<=0? 1: lastPage - (groupSize-1)
  
-
-  let paginationHTML = `<li class="page-item"><a class="page-link" href="#">Previous</a></li>`;
-
+if(page>1){
+   paginationHTML = `<li class="page-item " onclick="moveToPage(1)"><a class="page-link" href='#js-bottom'>&lt;&lt;</a></li>
+  <li class="page-item " onclick="moveToPage(${page-1})"><a class="page-link" href='#js-bottom'>&lt;</a></li>`;
+}
   for(let i=firstPage;i<=lastPage;i++ ){
-    paginationHTML += `<li class="page-item ${i===page?"active":""}" onclick="moveToPage(${i})"><a class="page-link" >${i}</a></li>`
+    paginationHTML += `<li class="page-item ${i===page?"active":""}" onclick="moveToPage(${i})"><a class="page-link" href='#js-bottom' onclick="pageClick(${i})" >${i}</a></li>`
   }
-  paginationHTML += `<li class="page-item"><a class="page-link" href="#">Next</a></li>`
+
+ if(page<totalPages) {
+  paginationHTML += `<li class="page-item" onclick="moveToPage(${page+1})"><a class="page-link" href='#js-program-detail-bottom'>&gt;</a></li>
+  <li class="page-item " onclick="moveToPage(${totalPages})"><a class="page-link" href='#js-bottom'>&gt;&gt;</a></li>`}
   document.querySelector(".pagination").innerHTML = paginationHTML;
 
 }
